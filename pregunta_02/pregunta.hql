@@ -13,13 +13,14 @@ Escriba el resultado a la carpeta `output` de directorio de trabajo.
         >>> Escriba su respuesta a partir de este punto <<<
 */
 DROP TABLE IF EXISTS data;
-DROP TABLE IF EXISTS result2;
-CREATE TABLE data (line STRING);
-CREATE TABLE result2(letter STRING, fecha date, value int);
-LOAD DATA LOCAL INPATH "pregunta_02/SOURCE/" OVERWRITE INTO TABLE data;
- 
-INSERT INTO result2
-SELECT split(line, '\\s')[0] AS letter, split(line, '\\s')[1] AS fecha, split(line, '\\s')[2] AS value FROM data;
+CREATE TABLE data (letter        STRING,
+                   dates         DATE,
+                   number        INT)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
 
-SELECT * FROM result2 ORDER BY letter, value;
+LOAD DATA LOCAL INPATH "data.tsv" OVERWRITE INTO TABLE data;
 
+INSERT OVERWRITE LOCAL DIRECTORY 'output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT letter, dates, number FROM data
+ORDER BY letter, number, dates;
